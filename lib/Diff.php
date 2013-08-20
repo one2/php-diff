@@ -173,4 +173,66 @@ class Diff
 		$this->groupedCodes = $sequenceMatcher->getGroupedOpcodes($this->options['context']);
 		return $this->groupedCodes;
 	}
+
+	//----------
+
+	/**
+	 * Get diff.
+	 *
+	 * @param array/string $a - First string to compare or array containing the lines of the first string to compare
+	 * @param array/string $b - Second string to compare or array containing the lines for the second string to compare
+	 * @param string $format - 'side-by-side' (default), 'inline', 'context' or 'unified'
+	 * @param array $ops_diff - The options for the diff
+	 * @param array $ops_render - The options for the renderer
+	 *
+	 * @return string (HTML)
+	 */
+	public static function get_diff($a, $b, $format='side-by-side', $ops_diff=array(), $ops_render=array()){
+
+		if(is_string($a)){
+			$a = str_replace(array("\r\n", "\r"), "\n", $a);
+			$a = explode("\n", $a);
+		}
+
+		if(is_string($b)){
+			$b = str_replace(array("\r\n", "\r"), "\n", $b);
+			$b = explode("\n", $b);
+		}
+
+
+		$diff = new Diff($a, $b, $ops_diff);
+
+		switch($format){
+			default:
+			case 'side-by-side':
+
+				require_once dirname(__FILE__).'/Diff/Renderer/Html/SideBySide.php';
+				$renderer = new Diff_Renderer_Html_SideBySide($ops_render);
+				$r=$diff->Render($renderer);
+				break;
+
+			case 'inline':
+
+				require_once dirname(__FILE__).'/Diff/Renderer/Html/Inline.php';
+				$renderer = new Diff_Renderer_Html_Inline($ops_render);
+				$r=$diff->render($renderer);
+				break;
+
+			case 'unified':
+
+				require_once dirname(__FILE__).'/Diff/Renderer/Text/Unified.php';
+				$renderer = new Diff_Renderer_Text_Unified;
+				$r='<pre>'.htmlspecialchars($diff->render($renderer)).'</pre>';
+				break;
+
+			case 'context':
+
+				require_once dirname(__FILE__).'/Diff/Renderer/Text/Context.php';
+				$renderer = new Diff_Renderer_Text_Context;
+				$r='<pre>'.htmlspecialchars($diff->render($renderer)).'</pre>';
+				break;
+		}
+
+		return $r;
+	}
 }
