@@ -82,12 +82,12 @@ class Diff_Renderer_Html_Array extends Diff_Renderer_Abstract
 
 						list($start, $end) = $this->getChangeExtent($fromLine, $toLine);
 						if($start != 0 || $end != 0) {
-							$last = $end + strlen($fromLine);
-							$fromLine = substr_replace($fromLine, "\0", $start, 0);
-							$fromLine = substr_replace($fromLine, "\1", $last + 1, 0);
-							$last = $end + strlen($toLine);
-							$toLine = substr_replace($toLine, "\0", $start, 0);
-							$toLine = substr_replace($toLine, "\1", $last + 1, 0);
+							$last = $end + mb_strlen($fromLine);
+							$fromLine = $this->mb_substr_replace($fromLine, "\0", $start, 0);
+							$fromLine = $this->mb_substr_replace($fromLine, "\1", $last + 1, 0);
+							$last = $end + mb_strlen($toLine);
+							$toLine = $this->mb_substr_replace($toLine, "\0", $start, 0);
+							$toLine = $this->mb_substr_replace($toLine, "\1", $last + 1, 0);
 							$a[$i1 + $i] = $fromLine;
 							$b[$j1 + $i] = $toLine;
 						}
@@ -149,19 +149,35 @@ class Diff_Renderer_Html_Array extends Diff_Renderer_Abstract
 	private function getChangeExtent($fromLine, $toLine)
 	{
 		$start = 0;
-		$limit = min(strlen($fromLine), strlen($toLine));
-		while($start < $limit && $fromLine{$start} == $toLine{$start}) {
+		$limit = min(mb_strlen($fromLine), mb_strlen($toLine));
+		while($start < $limit && mb_substr($fromLine, $start, 1) == mb_substr($toLine, $start, 1)) {
 			++$start;
 		}
 		$end = -1;
 		$limit = $limit - $start;
-		while(-$end <= $limit && substr($fromLine, $end, 1) == substr($toLine, $end, 1)) {
+		while(-$end <= $limit && mb_substr($fromLine, $end, 1) == mb_substr($toLine, $end, 1)) {
 			--$end;
 		}
 		return array(
 			$start,
 			$end + 1
 		);
+	}
+
+	/**
+	 * Replace text within a portion of a string.
+	 */
+	private function mb_substr_replace($string, $replacement, $start, $length=null){
+
+		if($length===null)
+			return mb_substr($string, 0, $start).$replacement;
+
+		$string_length = mb_strlen($string);
+
+		if($length < 0)
+			$length = $string_length - $start + $length;
+
+		return mb_substr($string, 0, $start).$replacement.mb_substr($string, $start + $length, $string_length);
 	}
 
 	/**
@@ -177,7 +193,9 @@ class Diff_Renderer_Html_Array extends Diff_Renderer_Abstract
 		$lines = array_map(array($this, 'ExpandTabs'), $lines);
 		$lines = array_map(array($this, 'HtmlSafe'), $lines);
 		foreach($lines as &$line) {
-			$line = preg_replace('# ( +)|^ #e', "\$this->fixSpaces('\\1')", $line);
+			$line = preg_replace_callback('# ( +)|^ #', function($c){
+				return $this->fixSpaces(isset($c[1])?$c[1]:'');
+			}, $line);
 		}
 		return $lines;
 	}
