@@ -44,6 +44,17 @@ require_once dirname(__FILE__).'/Array.php';
 
 class Diff_Renderer_Html_Inline extends Diff_Renderer_Html_Array
 {
+
+	/**
+	 * @var array Array of the default options that apply to this renderer.
+	 */
+	protected $defaultOptions = array(
+		'tabSize' => 4,
+		'title_a' => 'Old',
+		'title_b' => 'New',
+		'title_c' => 'Differences',
+	);
+
 	/**
 	 * Render a and return diff with changes between the two sequences
 	 * displayed inline (under each other)
@@ -61,9 +72,9 @@ class Diff_Renderer_Html_Inline extends Diff_Renderer_Html_Array
 		$html .= '<table class="Differences DifferencesInline">';
 		$html .= '<thead>';
 		$html .= '<tr>';
-		$html .= '<th>Old</th>';
-		$html .= '<th>New</th>';
-		$html .= '<th>Differences</th>';
+		$html .= '<th>'.$this->options['title_a'].'</th>';
+		$html .= '<th>'.$this->options['title_b'].'</th>';
+		$html .= '<th>'.$this->options['title_c'].'</th>';
 		$html .= '</tr>';
 		$html .= '</thead>';
 		foreach($changes as $i => $blocks) {
