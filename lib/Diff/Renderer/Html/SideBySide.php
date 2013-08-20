@@ -45,6 +45,15 @@ require_once dirname(__FILE__).'/Array.php';
 class Diff_Renderer_Html_SideBySide extends Diff_Renderer_Html_Array
 {
 	/**
+	 * @var array Array of the default options that apply to this renderer.
+	 */
+	protected $defaultOptions = array(
+		'tabSize' => 4,
+		'title_a' => 'Old Version',
+		'title_b' => 'New Version',
+	);
+
+	/**
 	 * Render a and return diff with changes between the two sequences
 	 * displayed side by side.
 	 *
@@ -62,8 +71,8 @@ class Diff_Renderer_Html_SideBySide extends Diff_Renderer_Html_Array
 		$html .= '<table class="Differences DifferencesSideBySide">';
 		$html .= '<thead>';
 		$html .= '<tr>';
-		$html .= '<th colspan="2">Old Version</th>';
-		$html .= '<th colspan="2">New Version</th>';
+		$html .= '<th colspan="2">'.$this->options['title_a'].'</th>';
+		$html .= '<th colspan="2">'.$this->options['title_b'].'</th>';
 		$html .= '</tr>';
 		$html .= '</thead>';
 		foreach($changes as $i => $blocks) {
