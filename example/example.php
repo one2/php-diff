@@ -24,46 +24,40 @@
 			//'ignoreCase' => true,
 		);
 
-		// Initialize the diff class
-		$diff = new Diff($a, $b, $options);
-
 		?>
 		<h2>Side by Side Diff</h2>
 		<?php
 
 		// Generate a side by side diff
-		require_once dirname(__FILE__).'/../lib/Diff/Renderer/Html/SideBySide.php';
-		$renderer = new Diff_Renderer_Html_SideBySide;
-		echo $diff->Render($renderer);
+		echo Diff::get_diff($a, $b, 'side-by-side', $options, array(
+			'title_a' => 'Old Version!!',
+			'title_b' => 'New Version!!',
+		));
 
 		?>
 		<h2>Inline Diff</h2>
 		<?php
 
 		// Generate an inline diff
-		require_once dirname(__FILE__).'/../lib/Diff/Renderer/Html/Inline.php';
-		$renderer = new Diff_Renderer_Html_Inline;
-		echo $diff->render($renderer);
+		echo Diff::get_diff($a, $b, 'inline', $options, array(
+			'title_a' => 'Old!!',
+			'title_b' => 'New!!',
+			'title_c' => 'Differences!!',
+		));
 
 		?>
 		<h2>Unified Diff</h2>
-		<pre><?php
+		<?php
 
 		// Generate a unified diff
-		require_once dirname(__FILE__).'/../lib/Diff/Renderer/Text/Unified.php';
-		$renderer = new Diff_Renderer_Text_Unified;
-		echo htmlspecialchars($diff->render($renderer));
+		echo Diff::get_diff($a, $b, 'unified', $options);
 
 		?>
-		</pre>
 		<h2>Context Diff</h2>
-		<pre><?php
+		<?php
 
 		// Generate a context diff
-		require_once dirname(__FILE__).'/../lib/Diff/Renderer/Text/Context.php';
-		$renderer = new Diff_Renderer_Text_Context;
-		echo htmlspecialchars($diff->render($renderer));
+		echo Diff::get_diff($a, $b, 'context', $options);
 		?>
-		</pre>
 	</body>
 </html>
